@@ -5,6 +5,8 @@ from typing import List, Union, Dict
 from pydantic import BaseModel
 import seaborn as sns
 import matplotlib.pyplot as plt
+import warnings
+
 
 def numeric_data(data):
     numeric_columns = []
@@ -22,27 +24,81 @@ def non_numeric_data(data):
     df = pd.DataFrame(data, columns=non_numeric_columns)
     return df
     
-def create_boxplots_by_column(data):
-    # Iterate over each column in the DataFrame
-    for column in data.columns:
-        # Create a boxplot for the current column
-        if data[column].dtypes == 'int64' or data[column].dtypes == 'float64':
-            sns.boxplot(x=data[column])
-            plt.title(f'Boxplot for {column}')
-            plt.show()
+def create_boxplots_by_column(data, num_cols):
+    numeric_columns = [column for column in data.columns 
+                       if data[column].dtypes == 'int64' or data[column].dtypes == 'float64']
+    
+    num_plots = len(numeric_columns)
+    #num_cols = 1  # Number of columns in the grid
+    num_rows = (num_plots + num_cols - 1) // num_cols  # Number of rows in the grid
+    
+    fig, axes = plt.subplots(num_rows, num_cols, figsize=(15, num_rows * 5))  # Create subplots
+    
+    for i, column in enumerate(numeric_columns):
+        row = i // num_cols  # Row index
+        col = i % num_cols   # Column index
+        sns.boxplot(x=data[column], ax=axes[row, col])  # Plot on specific axes
+        axes[row, col].set_title(f'{column}'.capitalize())
 
-def create_histplots_by_column(data):
-    pd.option_context('mode.use_inf_as_na', True)
-    for column in data.columns:
-        if data[column].dtypes == 'int64' or data[column].dtypes == 'float64':
-            sns.histplot(x=data[column])
-            plt.title(f'Histogram for {column}')
-            plt.show()
+    plt.suptitle("Boxplot Analysis", fontsize=16, y=1.02)
+        
+    # Hide any unused axes
+    for i in range(num_plots, num_rows * num_cols):
+        row = i // num_cols
+        col = i % num_cols
+        axes[row, col].axis('off')
+    
+    plt.tight_layout()
+    plt.show()
+    
+
+def create_histplots_by_column(data, num_cols):
+    numeric_columns = [column for column in data.columns 
+                       if data[column].dtypes == 'int64' or data[column].dtypes == 'float64']
+    
+    num_plots = len(numeric_columns)
+    #num_cols = 2  # Number of columns in the grid
+    num_rows = (num_plots + num_cols - 1) // num_cols  # Number of rows in the grid
+    
+    fig, axes = plt.subplots(num_rows, num_cols, figsize=(15, num_rows * 5))  # Create subplots
+    
+    for i, column in enumerate(numeric_columns):
+        row = i // num_cols  # Row index
+        col = i % num_cols   # Column index
+        sns.histplot(x=data[column], ax=axes[row, col])  # Plot on specific axes
+        axes[row, col].set_title(f'{column}'.capitalize())
+        
+    plt.suptitle("Histogram Analysis", fontsize=16, y=1.02)
+    
+    # Hide any unused axes
+    for i in range(num_plots, num_rows * num_cols):
+        row = i // num_cols
+        col = i % num_cols
+        axes[row, col].axis('off')
+    
+    plt.tight_layout()
+    plt.show()
+
             
 def create_heatmap(data):
     data = numeric_data(data)
     corr_matrix = data.corr()
-    sns.heatmap(corr_matrix)
+    
+    # Set up the heatmap figure
+    plt.figure(figsize=(8, 6))
+    
+    # Customize the appearance of the heatmap
+    sns.heatmap(corr_matrix, annot=True, fmt=".2f", linewidths=.5)
+    
+    # Add title to the heatmap
+    plt.title('Correlation Heatmap')
+    
+    # Adjust layout
+    plt.tight_layout()
+    
+    # Show the heatmap
+    plt.show()
+
 
 def data_input(csv: str) -> pd.DataFrame:
     """
@@ -122,17 +178,25 @@ def eda_report(data: DataFrame) -> pd.DataFrame:
     Returns:
         pd.DataFrame: An EDA report containing descriptive statistics, data types, null counts, and entry counts for each           column.
     """
-    df1 = pd.DataFrame(data_count(data)).T.rename(columns={0: 'entry_count'})
-    df1['data_type'] = data_type(data)
-    df1['null_count'] = data_isnull(data)
-    df2 = data_describe(data)
+    data_read = data_input(data)
+    df1 = pd.DataFrame(data_count(data_read)).T.rename(columns={0: 'entry_count'})
+    df1['data_type'] = data_type(data_read)
+    df1['null_count'] = data_isnull(data_read)
+    df2 = data_describe(data_read)
     report = pd.merge(df1, df2, left_index=True, right_index=True, how='left')
     return report
 
-def initial_analysis(csv: str):
-    data = data_input(csv)
-    print(eda_report(data))
-    print(create_boxplots_by_column(data))
-    print(create_histplots_by_column(data))
-    print(create_heatmap(data))
+
+def initial_analysis(csv: str, num_cols):
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore')
+        pd.set_option('mode.use_inf_as_na', True)
+        data = data_input(csv)
+        print('\n\n')
+        create_boxplots_by_column(data, num_cols)
+        print('\n\n')
+        create_histplots_by_column(data, num_cols)
+        print('\n\n')
+        create_heatmap(data)
+
     
