@@ -2,7 +2,8 @@
 import pandas as pd
 from pandas import DataFrame
 from typing import List, Union, Dict
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError
+from pydantic.decorator import validate_arguments
 import seaborn as sns
 import matplotlib.pyplot as plt
 import warnings
@@ -61,7 +62,7 @@ class HistPlotCreation(PlotCreation):
     num_cols: int
 
 
-
+@validate_arguments(config=dict(arbitrary_types_allowed=True))
 def numeric_data(data: DataFrame) -> NumericOutput:
     numeric_columns = [column for column in data.columns 
                        if data[column].dtypes == 'int64' or data[column].dtypes == 'float64']
@@ -69,13 +70,14 @@ def numeric_data(data: DataFrame) -> NumericOutput:
     dataframe = pd.DataFrame(data, columns=numeric_columns)
     return NumericOutput(data = dataframe).data
 
-
+@validate_arguments(config=dict(arbitrary_types_allowed=True))
 def non_numeric_data(data: DataFrame) -> NonNumericOutput:
     non_numeric_columns = [column for column in data.columns
                            if data[column].dtypes != 'int64' and data[column].dtypes != 'float64']
     df = pd.DataFrame(data, columns=non_numeric_columns)
     return NonNumericOutput(data = df).data
     
+@validate_arguments(config=dict(arbitrary_types_allowed=True)) 
 def create_subplots(data: DataFrame, plot_type: str, num_cols: int) -> None:
     """
     Creates subplots for the specified plot type.
@@ -111,7 +113,7 @@ def create_subplots(data: DataFrame, plot_type: str, num_cols: int) -> None:
     plt.tight_layout()
     plt.show()    
 
-
+@validate_arguments(config=dict(arbitrary_types_allowed=True))
 def create_heatmap(data: DataFrame) -> None:
     data = numeric_data(data)
     corr_matrix = data.corr()
@@ -131,7 +133,7 @@ def create_heatmap(data: DataFrame) -> None:
     # Show the heatmap
     plt.show()
 
-
+@validate_arguments(config=dict(arbitrary_types_allowed=True))
 def data_input(csv: str) -> pd.DataFrame:
     """
     Read a CSV file and return its contents as a DataFrame.
@@ -143,8 +145,8 @@ def data_input(csv: str) -> pd.DataFrame:
         pd.DataFrame: A DataFrame containing the data from the CSV file.
     """
     return pd.read_csv(csv)
-    
-    
+
+@validate_arguments(config=dict(arbitrary_types_allowed=True))
 def data_describe(data: DataFrame) -> pd.DataFrame:
     """
     Generate descriptive statistics of the DataFrame columns.
@@ -157,7 +159,7 @@ def data_describe(data: DataFrame) -> pd.DataFrame:
     """
     return data.describe().T.drop(columns='count')
     
-    
+@validate_arguments(config=dict(arbitrary_types_allowed=True))  
 def data_isnull(data: DataFrame) -> pd.DataFrame:
     """
     Count the number of missing values in each column of the DataFrame.
@@ -170,7 +172,7 @@ def data_isnull(data: DataFrame) -> pd.DataFrame:
     """
     return data.isnull().sum().to_frame().rename(columns={0: 'null_count'})
     
-
+@validate_arguments(config=dict(arbitrary_types_allowed=True))
 def data_type(data: DataFrame) -> pd.Series:
     """
     Get the data types of each column in the DataFrame.
@@ -183,7 +185,7 @@ def data_type(data: DataFrame) -> pd.Series:
     """
     return data.dtypes
     
-    
+@validate_arguments(config=dict(arbitrary_types_allowed=True)) 
 def data_count(data: DataFrame) -> dict:
     """
     Count the number of entries in each column of the DataFrame.
@@ -199,8 +201,8 @@ def data_count(data: DataFrame) -> dict:
         count_dict[column] = [data.shape[0]]
     return count_dict
     
-    
-def stats_report(csv: str) -> pd.DataFrame:
+@validate_arguments(config=dict(arbitrary_types_allowed=True))  
+def stats_report(csv: str) -> DataFrame:
     """
     Generate an Exploratory Data Analysis (EDA) report for the DataFrame.
 
@@ -218,8 +220,8 @@ def stats_report(csv: str) -> pd.DataFrame:
     report = pd.merge(df1, df2, left_index=True, right_index=True, how='left')
     return report
 
-
-def initial_analysis(csv: str, num_cols):
+@validate_arguments(config=dict(arbitrary_types_allowed=True))
+def initial_analysis(csv: str, num_cols: int) -> None:
     with warnings.catch_warnings():
         warnings.simplefilter('ignore')
         pd.set_option('mode.use_inf_as_na', True)
