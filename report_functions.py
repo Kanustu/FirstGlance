@@ -8,79 +8,111 @@ import matplotlib.pyplot as plt
 import warnings
 
 
-def numeric_data(data):
-    numeric_columns = []
-    for column in data.columns:
-        if data[column].dtypes == 'int64' or data[column].dtypes == 'float64':
-            numeric_columns.append(column)
-    df = pd.DataFrame(data, columns=numeric_columns)
-    return df
+class Outputs(BaseModel):
+    """
+    Base class for input data models.
+    """
 
-def non_numeric_data(data):
-    non_numeric_columns = []
-    for column in data.columns:
-        if data[column].dtypes != 'int64' and data[column].dtypes != 'float64':
-            non_numeric_columns.append(column)
+    class Config:
+        """
+        Pydantic configuration settings.
+        """
+        arbitrary_types_allowed = True
+
+        
+class NumericOutput(Outputs):
+    """
+    Model for numeric input data.
+    """
+    data: DataFrame
+    
+
+class NonNumericOutput(Outputs):
+    """
+    Model for non-numeric input data.
+    """
+    data: DataFrame
+    
+
+class PlotCreation(BaseModel):
+    """
+    Base class for plot creation models.
+    """
+
+    class Config:
+        """
+        Pydantic configuration settings.
+        """
+        arbitrary_types_allowed = True
+    
+
+class BoxPlotCreation(PlotCreation):
+    """
+    Model for creating box plots.
+    """
+    data: DataFrame
+    num_cols: int
+
+class HistPlotCreation(PlotCreation):
+    """
+    Model for creating histogram plots.
+    """
+    data: DataFrame
+    num_cols: int
+
+
+
+def numeric_data(data: DataFrame) -> NumericOutput:
+    numeric_columns = [column for column in data.columns 
+                       if data[column].dtypes == 'int64' or data[column].dtypes == 'float64']
+    # Create a new DataFrame with only numeric columns
+    dataframe = pd.DataFrame(data, columns=numeric_columns)
+    return NumericOutput(data = dataframe).data
+
+
+def non_numeric_data(data: DataFrame) -> NonNumericOutput:
+    non_numeric_columns = [column for column in data.columns
+                           if data[column].dtypes != 'int64' and data[column].dtypes != 'float64']
     df = pd.DataFrame(data, columns=non_numeric_columns)
-    return df
+    return NonNumericOutput(data = df).data
     
-def create_boxplots_by_column(data, num_cols):
+def create_subplots(data: DataFrame, plot_type: str, num_cols: int) -> None:
+    """
+    Creates subplots for the specified plot type.
+
+    Parameters:
+        data (DataFrame): Input DataFrame.
+        plot_type (str): Type of plot ('boxplot' or 'histplot').
+        num_cols (int): Number of columns in the grid for subplots.
+    """
     numeric_columns = [column for column in data.columns 
                        if data[column].dtypes == 'int64' or data[column].dtypes == 'float64']
-    
     num_plots = len(numeric_columns)
-    #num_cols = 1  # Number of columns in the grid
-    num_rows = (num_plots + num_cols - 1) // num_cols  # Number of rows in the grid
-    
-    fig, axes = plt.subplots(num_rows, num_cols, figsize=(15, num_rows * 5))  # Create subplots
+    num_rows = (num_plots + num_cols - 1) // num_cols
+    fig, axes = plt.subplots(num_rows, num_cols, figsize=(15, num_rows * 5))
     
     for i, column in enumerate(numeric_columns):
-        row = i // num_cols  # Row index
-        col = i % num_cols   # Column index
-        sns.boxplot(x=data[column], ax=axes[row, col])  # Plot on specific axes
+        row = i // num_cols
+        col = i % num_cols
+        if plot_type == 'boxplot':
+            sns.boxplot(x=data[column], ax=axes[row, col])
+        elif plot_type == 'histplot':
+            sns.histplot(x=data[column], ax=axes[row, col])
         axes[row, col].set_title(f'{column}'.capitalize())
-
-    plt.suptitle("Boxplot Analysis", fontsize=16, y=1.02)
-        
-    # Hide any unused axes
+    
+    plot_title = "Boxplot" if plot_type == 'boxplot' else "Histogram"
+    plt.suptitle(f"{plot_title} Analysis", fontsize=16, y=1.02)
+    
     for i in range(num_plots, num_rows * num_cols):
         row = i // num_cols
         col = i % num_cols
         axes[row, col].axis('off')
     
     plt.tight_layout()
-    plt.show()
-    
+    plt.show()    
 
-def create_histplots_by_column(data, num_cols):
-    numeric_columns = [column for column in data.columns 
-                       if data[column].dtypes == 'int64' or data[column].dtypes == 'float64']
-    
-    num_plots = len(numeric_columns)
-    #num_cols = 2  # Number of columns in the grid
-    num_rows = (num_plots + num_cols - 1) // num_cols  # Number of rows in the grid
-    
-    fig, axes = plt.subplots(num_rows, num_cols, figsize=(15, num_rows * 5))  # Create subplots
-    
-    for i, column in enumerate(numeric_columns):
-        row = i // num_cols  # Row index
-        col = i % num_cols   # Column index
-        sns.histplot(x=data[column], ax=axes[row, col])  # Plot on specific axes
-        axes[row, col].set_title(f'{column}'.capitalize())
-        
-    plt.suptitle("Histogram Analysis", fontsize=16, y=1.02)
-    
-    # Hide any unused axes
-    for i in range(num_plots, num_rows * num_cols):
-        row = i // num_cols
-        col = i % num_cols
-        axes[row, col].axis('off')
-    
-    plt.tight_layout()
-    plt.show()
 
-            
-def create_heatmap(data):
+def create_heatmap(data: DataFrame) -> None:
     data = numeric_data(data)
     corr_matrix = data.corr()
     
@@ -168,7 +200,7 @@ def data_count(data: DataFrame) -> dict:
     return count_dict
     
     
-def eda_report(data: DataFrame) -> pd.DataFrame:
+def stats_report(csv: str) -> pd.DataFrame:
     """
     Generate an Exploratory Data Analysis (EDA) report for the DataFrame.
 
@@ -176,13 +208,13 @@ def eda_report(data: DataFrame) -> pd.DataFrame:
         data (pd.DataFrame): The input DataFrame.
 
     Returns:
-        pd.DataFrame: An EDA report containing descriptive statistics, data types, null counts, and entry counts for each           column.
+        pd.DataFrame: An EDA report containing descriptive statistics, data types, null counts, and entry counts for each                   column.
     """
-    data_read = data_input(data)
-    df1 = pd.DataFrame(data_count(data_read)).T.rename(columns={0: 'entry_count'})
-    df1['data_type'] = data_type(data_read)
-    df1['null_count'] = data_isnull(data_read)
-    df2 = data_describe(data_read)
+    data = data_input(csv)
+    df1 = pd.DataFrame(data_count(data)).T.rename(columns={0: 'entry_count'})
+    df1['data_type'] = data_type(data)
+    df1['null_count'] = data_isnull(data)
+    df2 = data_describe(data)
     report = pd.merge(df1, df2, left_index=True, right_index=True, how='left')
     return report
 
@@ -192,10 +224,10 @@ def initial_analysis(csv: str, num_cols):
         warnings.simplefilter('ignore')
         pd.set_option('mode.use_inf_as_na', True)
         data = data_input(csv)
+        print('\n')
+        create_subplots(data, 'boxplot', num_cols)
         print('\n\n')
-        create_boxplots_by_column(data, num_cols)
-        print('\n\n')
-        create_histplots_by_column(data, num_cols)
+        create_subplots(data, 'histplot', num_cols)
         print('\n\n')
         create_heatmap(data)
 
