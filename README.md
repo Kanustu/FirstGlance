@@ -1,7 +1,28 @@
-# analysis_reporting
-- this module was created with the intention of being used for very preliminary EDA, as in the first that would be run on a new dataset, it's a personal tool that I use to get a quick look at new data and what direction to then continue in
-  
-- using eda_report will return a pandas dataframe that combines a count of entries, the datatype of each column, the count of nulls within each column and descriptive statistics for each column.
-  
-- using initial_analysis will return a collection of visualizations using the numeric columns, including boxplots, histograms and correlation heatmaps, you can also set how many columns you want the boxplots and histograms to appear in.
-- 
+# InitialAnalysis
+
+InitialAnalysis is a Python library created with the intention of being used for very preliminary.
+
+## Installation
+
+Use the package manager [pip](https://pip.pypa.io/en/stable/) to install InitialAnalysis.
+
+```bash
+pip install InitialAnalysis
+```
+
+## Usage
+
+```python
+import InitialAnalysis
+
+# Returns seaborn boxplots, histograms, and heatmap using the numeric columns
+InitialAnalysis.plot_analysis('example.csv')
+
+# Returns pandas dataframe with entry count, null count, datatype and descriptive statistics for each column
+InitialAnalysis.stats_report('example.csv')
+
+```
+
+## License
+
+- choose a license--needs to be done
