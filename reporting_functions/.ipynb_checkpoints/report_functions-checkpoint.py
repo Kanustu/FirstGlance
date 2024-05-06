@@ -7,8 +7,6 @@ import matplotlib.pyplot as plt
 import warnings
 
 
-    
-
 def create_subplots(data: DataFrame, plot_type: str) -> None:
     """
     Creates subplots for the specified plot type.
@@ -16,7 +14,6 @@ def create_subplots(data: DataFrame, plot_type: str) -> None:
     Parameters:
         data (DataFrame): Input DataFrame.
         plot_type (str): Type of plot ('boxplot' or 'histplot').
-        num_cols (int): Number of columns in the grid for subplots.
     """
     numeric_columns = [column for column in data.columns 
                        if data[column].dtypes == 'int64' or data[column].dtypes == 'float64']
@@ -34,6 +31,7 @@ def create_subplots(data: DataFrame, plot_type: str) -> None:
             sns.histplot(x=data[column], ax=axes[row, col])
         else:
             raise ValueError(f'{plot_type} is not a valid input')
+
         axes[row, col].set_title(f'{column}'.capitalize())
     
     plot_title = "Boxplot" if plot_type == 'boxplot' else "Histogram"
@@ -49,6 +47,12 @@ def create_subplots(data: DataFrame, plot_type: str) -> None:
 
 
 def create_heatmap(data: DataFrame) -> None:
+    """
+    Creates a heatmap of correlation matrix.
+
+    Parameters:
+        data (DataFrame): Input DataFrame.
+    """
     numeric_columns = [column for column in data.columns 
                        if data[column].dtypes == 'int64' or data[column].dtypes == 'float64']
     numeric_data = data[numeric_columns]
@@ -93,10 +97,13 @@ def data_describe(data: DataFrame) -> pd.DataFrame:
     Returns:
         pd.DataFrame: Descriptive statistics for the DataFrame columns.
     """
-    return data.describe().T.drop(columns='count')
+    data = data.describe()
+    data_transpose = data.T
+    data_describe = data_transpose.drop(columns='count')
+    return data_describe
     
 
-def data_isnull(data: DataFrame) -> pd.DataFrame:
+def data_is_null(data: DataFrame) -> pd.DataFrame:
     """
     Count the number of missing values in each column of the DataFrame.
 
@@ -106,8 +113,9 @@ def data_isnull(data: DataFrame) -> pd.DataFrame:
     Returns:
         pd.DataFrame: A DataFrame containing the count of missing values for each column.
     """
-    return data.isnull().sum().to_frame().rename(columns={0: 'null_count'})
-    
+    result = data.isnull().sum().to_frame()
+    data = result.rename(columns={0: 'null_count'})
+    return data
 
 def data_type(data: DataFrame) -> pd.Series:
     """
@@ -151,13 +159,19 @@ def stats_report(csv: str) -> DataFrame:
     data = data_input(csv)
     df1 = pd.DataFrame(data_count(data)).T.rename(columns={0: 'entry_count'})
     df1['data_type'] = data_type(data)
-    df1['null_count'] = data_isnull(data)
+    df1['null_count'] = data_is_null(data)
     df2 = data_describe(data)
     report = pd.merge(df1, df2, left_index=True, right_index=True, how='left')
     return report
 
 
 def initial_analysis(csv: str) -> None:
+    """
+    Perform initial analysis of the data.
+
+    Parameters:
+        csv (str): The file path to the CSV file.
+    """
     with warnings.catch_warnings():
         warnings.simplefilter('ignore')
         pd.set_option('mode.use_inf_as_na', True)
@@ -168,5 +182,3 @@ def initial_analysis(csv: str) -> None:
         create_subplots(data, 'histplot')
         print('\n\n')
         create_heatmap(data)
-
-    

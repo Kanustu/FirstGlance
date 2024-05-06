@@ -7,8 +7,6 @@ import matplotlib.pyplot as plt
 import warnings
 
 
-    
-
 def create_subplots(data: DataFrame, plot_type: str) -> None:
     """
     Creates subplots for the specified plot type.
@@ -16,7 +14,6 @@ def create_subplots(data: DataFrame, plot_type: str) -> None:
     Parameters:
         data (DataFrame): Input DataFrame.
         plot_type (str): Type of plot ('boxplot' or 'histplot').
-        num_cols (int): Number of columns in the grid for subplots.
     """
     numeric_columns = [column for column in data.columns 
                        if data[column].dtypes == 'int64' or data[column].dtypes == 'float64']
@@ -50,6 +47,12 @@ def create_subplots(data: DataFrame, plot_type: str) -> None:
 
 
 def create_heatmap(data: DataFrame) -> None:
+    """
+    Creates a heatmap of correlation matrix.
+
+    Parameters:
+        data (DataFrame): Input DataFrame.
+    """
     numeric_columns = [column for column in data.columns 
                        if data[column].dtypes == 'int64' or data[column].dtypes == 'float64']
     numeric_data = data[numeric_columns]
@@ -162,7 +165,13 @@ def stats_report(csv: str) -> DataFrame:
     return report
 
 
-def initial_analysis(csv: str) -> None:
+def plot_analysis(csv: str) -> None:
+    """
+    Perform initial analysis of the data.
+
+    Parameters:
+        csv (str): The file path to the CSV file.
+    """
     with warnings.catch_warnings():
         warnings.simplefilter('ignore')
         pd.set_option('mode.use_inf_as_na', True)
@@ -173,5 +182,3 @@ def initial_analysis(csv: str) -> None:
         create_subplots(data, 'histplot')
         print('\n\n')
         create_heatmap(data)
-
-    
