@@ -1,27 +1,27 @@
-# InitialAnalysis
+# FirstGlance
 
-InitialAnalysis is a Python library created with the intention of being used for preliminary data analysis primarily within a notebook environment.
+FirstGlance is a Python library created with the intention of being used for preliminary data analysis primarily within a notebook environment.
 
 ## Installation
 
-Use the package manager [pip](https://pip.pypa.io/en/stable/) to install InitialAnalysis.
+Use the package manager [pip](https://pip.pypa.io/en/stable/) to install FirstGlance.
 
 ```bash
-pip install InitialAnalysis
+pip install FirstGlance
 ```
 
 ## Usage
 
 ```python
-import InitialAnalysis as ia
+import FirstGlance as fg
 
 # Returns seaborn boxplots, histograms, and heatmap using the numeric columns
-ia.plot_analysis('example.csv')
+fg.plot_analysis('example.csv')
 
 - add screenshot
 
 # Returns pandas dataframe with entry count, null count, datatype and descriptive statistics for each column
-ia.stats_report('example.csv')
+fg.stats_report('example.csv')
 
 - add screenshot
 
