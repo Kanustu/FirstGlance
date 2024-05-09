@@ -23,9 +23,9 @@ fg.plot_analysis('example.csv')
 # Returns pandas dataframe with entry count, null count, datatype and descriptive statistics for each column
 fg.stats_report('example.csv')
 
-![Stats_report example](stats_report.png)
 
 ```
+![Stats_report example](stats_report.png)
 
 ## Dependencies
 
