@@ -7,6 +7,15 @@ import matplotlib.pyplot as plt
 import warnings
 
 
+import matplotlib.pyplot as plt
+import seaborn as sns
+from pandas import DataFrame
+
+import matplotlib.pyplot as plt
+import seaborn as sns
+from pandas import DataFrame
+
+
 def create_subplots(data: DataFrame, plot_type: str) -> None:
     """
     Creates subplots for the specified plot type.
@@ -18,32 +27,51 @@ def create_subplots(data: DataFrame, plot_type: str) -> None:
     numeric_columns = [column for column in data.columns 
                        if data[column].dtypes == 'int64' or data[column].dtypes == 'float64']
     num_plots = len(numeric_columns)
-    num_cols = 2
-    num_rows = (num_plots + num_cols - 1) // num_cols
-    fig, axes = plt.subplots(num_rows, num_cols, figsize=(15, num_rows * 5))
+    if num_plots == 0:
+        print("No numeric columns found in the DataFrame.")
+        return
     
+    # Determine the number of rows and columns for subplots
+    num_cols = min(3, num_plots)  # Maximum of 3 columns
+    num_rows = (num_plots + num_cols - 1) // num_cols
+    
+    # Create subplots
+    if num_cols <= 1:
+        raise ValueError('There must be more than one numeric column in the dataframe')
+    elif num_cols == 2:
+        fig, axes = plt.subplots(num_plots, 1, figsize=(8, num_plots * 5))
+    else:
+        fig, axes = plt.subplots(num_rows, num_cols, figsize=(15, num_rows * 5))
+        return
+        
+    # Iterate over numeric columns and create plots
     for i, column in enumerate(numeric_columns):
-        row = i // num_cols
-        col = i % num_cols
+        if num_cols <= 1:
+            print('There must be more than one numeric column in the dataframe.')
+            return
+        if num_cols == 2:
+            ax = axes[i]
+        else:
+            row = i // num_cols
+            col = i % num_cols
+            ax = axes[row, col]
+        
         if plot_type == 'boxplot':
-            sns.boxplot(x=data[column], ax=axes[row, col])
+            sns.boxplot(x=data[column], ax=ax)
         elif plot_type == 'histplot':
-            sns.histplot(x=data[column], ax=axes[row, col])
+            sns.histplot(x=data[column], ax=ax)
         else:
             raise ValueError(f'{plot_type} is not a valid input')
 
-        axes[row, col].set_title(f'{column}'.capitalize())
+        ax.set_title(f'{column}'.capitalize())
     
     plot_title = "Boxplot" if plot_type == 'boxplot' else "Histogram"
     plt.suptitle(f"{plot_title} Analysis", fontsize=16, y=1.02)
     
-    for i in range(num_plots, num_rows * num_cols):
-        row = i // num_cols
-        col = i % num_cols
-        axes[row, col].axis('off')
-    
     plt.tight_layout()
-    plt.show()    
+    plt.show()
+
+
 
 
 def create_heatmap(data: DataFrame) -> None:

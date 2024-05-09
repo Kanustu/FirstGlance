@@ -23,7 +23,7 @@ fg.plot_analysis('example.csv')
 # Returns pandas dataframe with entry count, null count, datatype and descriptive statistics for each column
 fg.stats_report('example.csv')
 
-- add screenshot
+<img src="stat_reports.png" alt="Screenshot of Notebook Cell" width="400" height=200/>
 
 ```
 
@@ -42,7 +42,7 @@ pip install pandas seaborn
 
 MIT License
 
-Copyright (c) [year] [fullname]
+Copyright (c) 2024 Jordan Kanius
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
