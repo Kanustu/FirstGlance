@@ -32,7 +32,7 @@ def create_subplots(data: DataFrame, plot_type: str) -> None:
         return
     
     # Determine the number of rows and columns for subplots
-    num_cols = min(3, num_plots)  # Maximum of 3 columns
+    num_cols = min(2, num_plots)
     num_rows = (num_plots + num_cols - 1) // num_cols
     
     # Create subplots
