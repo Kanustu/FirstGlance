@@ -1,9 +1,8 @@
-```python
 import pandas as pd
 import numpy as np
 import pytest
 import matplotlib.pyplot as plt
-from report_functions import (create_subplots, create_heatmap, data_input, data_describe, 
+from reporting_functions import (create_subplots, create_heatmap, data_input, data_describe, 
                               data_is_null, data_type, data_count, stats_report, initial_analysis)
 
 
