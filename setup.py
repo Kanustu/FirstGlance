@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='first_glance',
-    version='1.0.0',
+    version='1.0.1',
     author='Jordan Kanius',
     author_email='Kaniusjordan@gmail.com',
     description='Quick plotting and examination for early analysis of data',
