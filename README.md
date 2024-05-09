@@ -1,6 +1,6 @@
-# FirstGlance
+# First_glance
 
-FirstGlance is a Python library created with the intention of being used for preliminary data analysis primarily within a notebook environment.
+First_glance is a Python library created with the intention of being used for preliminary data analysis primarily within a notebook environment.
 
 ## Installation
 
