@@ -14,18 +14,17 @@ pip install FirstGlance
 
 ```python
 import FirstGlance as fg
+```
 
+```python
 # Returns seaborn boxplots, histograms, and heatmap using the numeric columns
 fg.plot_analysis('example.csv')
+```
 
-- add screenshot
-
+```python
 # Returns pandas dataframe with entry count, null count, datatype and descriptive statistics for each column
 fg.stats_report('example.csv')
-
-
 ```
-![Stats_report example](stats_report.png)
 
 ## Dependencies
 
