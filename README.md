@@ -4,16 +4,16 @@ FirstGlance is a Python library created with the intention of being used for pre
 
 ## Installation
 
-Use the package manager [pip](https://pip.pypa.io/en/stable/) to install FirstGlance.
+Use the package manager [pip](https://pip.pypa.io/en/stable/) to install first_glance.
 
 ```bash
-pip install FirstGlance
+pip install first_glance
 ```
 
 ## Usage
 
 ```python
-from FirstGlance import report
+from first_glance import report
 ```
 
 ```python
