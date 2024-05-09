@@ -23,7 +23,7 @@ fg.plot_analysis('example.csv')
 # Returns pandas dataframe with entry count, null count, datatype and descriptive statistics for each column
 fg.stats_report('example.csv')
 
-<img src="stat_reports.png" alt="Screenshot of Notebook Cell" width="400" height=200/>
+<img src="stat_reports.png" alt="Screenshot of Notebook Cell" width="400" height="200"/>
 
 ```
 
