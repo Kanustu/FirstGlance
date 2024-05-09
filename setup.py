@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='FirstGlance',
+    name='first_glance',
     version='1.0.0',
     author='Jordan Kanius',
     author_email='Kaniusjordan@gmail.com',
